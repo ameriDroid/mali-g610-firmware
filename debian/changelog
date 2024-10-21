@@ -1,0 +1,5 @@
+mali-g610-firmware (1.0.4) bookworm; urgency=medium
+
+  * Update mali firmware g18p0
+
+ -- Jianfeng Liu <liujianfeng1994@gmail.com>  Fri, 28 Jul 2023 20:34:25 +0800

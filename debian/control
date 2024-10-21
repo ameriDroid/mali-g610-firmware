@@ -1,0 +1,15 @@
+Source: mali-g610-firmware
+Section: kernel
+Priority: optional
+Maintainer: Jianfeng Liu <liujianfeng1994@gmail.com>
+Build-Depends: debhelper-compat (= 13)
+Standards-Version: 4.6.0
+Homepage: https://github.com/JeffyCN/rockchip_mirrors/blob/libmali/firmware/g610/mali_csffw.bin
+Rules-Requires-Root: no
+
+Package: mali-g610-firmware
+Multi-Arch: foreign
+Architecture: all
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: <insert up to 60 chars description>
+ <insert long description, indented with spaces>
