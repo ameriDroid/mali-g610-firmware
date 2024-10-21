@@ -1,0 +1,5 @@
+/debian/*.substvars
+/debian/mali-g610-firmware
+/debian/.debhelper
+/debian/debhelper-build-stamp
+/debian/files
