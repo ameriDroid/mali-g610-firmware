@@ -1,0 +1,53 @@
+name: Build and Upload test package
+on:
+  push:
+    branches:
+      - main
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Build packages
+        run: |
+          sudo apt-get update
+          sudo apt-get build-dep --no-install-recommends -y .
+          sudo apt-get install --no-install-recommends -y git-buildpackage debhelper devscripts
+          debuild --no-lintian -us -uc
+
+      - name: Workaround actions
+        run: |
+          echo "artifacts_path=$(realpath ..)" >> $GITHUB_ENV
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ github.event.repository.name }}
+          path: |
+            ${{ env.artifacts_path }}/*.deb
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    if: ${{ github.event_name != 'pull_request' && github.ref_name == 'main' }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: ${{ github.event.repository.name }}
+
+      - name: Prepare package list
+        id: prepare_packages
+        run: |
+          debs=$(ls ./*.deb | tr '\n' ',' | sed 's/,$//')
+          echo "packages=$debs" >> $GITHUB_ENV
+
+      - name: Upload to APT repository
+        uses: ameriDroid/apt-repo/.github/actions/upload-to-repo@main
+        with:
+          codename: "bookworm-testing"
+          package-paths: "${{ env.packages }}"
