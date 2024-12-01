@@ -1,3 +1,15 @@
+mali-g610-firmware (1.0.4~1) bookworm; urgency=medium
+
+  * add gitignore
+  * ci
+  * APT repo update
+  * SSH push
+  * release CI
+  * Update release workflow permissions to allow write access
+  * Add fallback for empty commits in build and release workflows
+
+ -- rippanda12 <panda@ameridroid.com>  Sun, 01 Dec 2024 14:32:36 +0100
+
 mali-g610-firmware (1.0.4) bookworm; urgency=medium
 
   * Update mali firmware g18p0
