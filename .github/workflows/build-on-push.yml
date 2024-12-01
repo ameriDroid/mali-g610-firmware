@@ -36,18 +36,47 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          repository: ameridroid/apt-repo
+          path: /repo
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y reprepro gnupg git unzip
+
       - uses: actions/download-artifact@v4
         with:
           name: ${{ github.event.repository.name }}
 
-      - name: Prepare package list
-        id: prepare_packages
+      - name: Extract artifacts
         run: |
-          debs=$(ls ./*.deb | tr '\n' ',' | sed 's/,$//')
-          echo "packages=$debs" >> $GITHUB_ENV
+          unzip ${{ github.event.repository.name }}.zip -d /tmp/
+  
+      - name: Import GPG key
+        env:
+          GPG_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
+        run: |
+          echo "$GPG_KEY" | gpg --import
+          gpg --list-keys
 
-      - name: Upload to APT repository
-        uses: ameriDroid/apt-repo/.github/actions/upload-to-repo@main
-        with:
-          codename: "bookworm-testing"
-          package-paths: "${{ env.packages }}"
+      - name: Upload packages to APT repository
+        run: |
+          cd /repo
+          for package in /tmp/*.deb; do
+            for codename in bookworm-testing trixie-testing; do
+              reprepro --ignore=wrongdistribution includedeb $codename $package
+            done
+          done
+
+      - name: Push updated repository to main branch
+        run: |
+          cd /repo
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "actions@github.com"
+          git add -A
+          git commit -m "Update ${{ github.event.repository.name}}"
+          git push origin main
+    
