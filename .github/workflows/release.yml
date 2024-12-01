@@ -1,11 +1,6 @@
-name: Build and Upload test package
-
+name: Build and Upload release package
 on:
-  push:
-    paths:
-      - 'debian/changelog'
-    
-
+  workflow_dispatch:
 
 jobs:
   build:
@@ -75,7 +70,7 @@ jobs:
         run: |
           cd ./repo
           for package in ../*.deb; do
-            for codename in bookworm-testing trixie-testing sid-testing oracular-testing; do
+            for codename in bookworm trixie sid oracular; do
               reprepro --ignore=wrongdistribution includedeb $codename $package
             done
           done
@@ -89,4 +84,27 @@ jobs:
           git commit -m "Update ${{ github.event.repository.name}}"
           git remote set-url origin git@github.com:ameriDroid/apt-repo.git
           git push origin main
+
+      - name: Release notes
+        run: |
+          version="$(dpkg-parsechangelog -S Version)"
+          echo "version=$version" >> $GITHUB_ENV
+          echo "changes<<EOF" >> $GITHUB_ENV
+          echo '```' >> $GITHUB_ENV
+          echo "$(dpkg-parsechangelog -S Changes)" >> $GITHUB_ENV
+          echo '```' >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
+
+      - name: Release
+        uses: softprops/action-gh-release@v2.1.0
+        with:
+          files: |
+            ./*.deb
+          token: ${{ secrets.GITHUB_TOKEN }}
+          tag_name: ${{ env.version }}
+          body: |
+            ## Changelog for ${{ env.version }}
+            ${{ env.changes }}
+          draft: false
+          prerelease: false
     
