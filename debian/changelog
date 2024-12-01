@@ -1,4 +1,4 @@
-mali-g610-firmware (1.0.4~1) bookworm; urgency=medium
+mali-g610-firmware (1.0.5) bookworm; urgency=medium
 
   * add gitignore
   * ci
