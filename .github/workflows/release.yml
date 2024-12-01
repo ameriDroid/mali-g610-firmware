@@ -91,6 +91,8 @@ jobs:
       - name: Release notes
         run: |
           version="$(dpkg-parsechangelog -S Version)"
+          # replace ~ with - to match tag format
+          version="${version//\~/\-}"
           echo "version=$version" >> $GITHUB_ENV
           echo "changes<<EOF" >> $GITHUB_ENV
           echo '```' >> $GITHUB_ENV
