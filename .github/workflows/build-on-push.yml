@@ -40,7 +40,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: ameridroid/apt-repo
-          path: /repo
+          path: repo
 
       - name: Install dependencies
         run: |
@@ -53,7 +53,7 @@ jobs:
 
       - name: Extract artifacts
         run: |
-          unzip ${{ github.event.repository.name }}.zip -d /tmp/
+          ls *.deb
   
       - name: Import GPG key
         env:
@@ -64,8 +64,8 @@ jobs:
 
       - name: Upload packages to APT repository
         run: |
-          cd /repo
-          for package in /tmp/*.deb; do
+          cd ./repo
+          for package in ../*.deb; do
             for codename in bookworm-testing trixie-testing; do
               reprepro --ignore=wrongdistribution includedeb $codename $package
             done
@@ -73,7 +73,7 @@ jobs:
 
       - name: Push updated repository to main branch
         run: |
-          cd /repo
+          cd ./repo
           git config --global user.name "GitHub Actions"
           git config --global user.email "actions@github.com"
           git add -A
