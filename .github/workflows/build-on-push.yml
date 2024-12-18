@@ -1,6 +1,7 @@
 name: Build and Upload test package
 
 on:
+  workflow_dispatch:
   push:
     paths:
       - 'debian/changelog'
@@ -9,7 +10,7 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: [ self-hosted, ubuntu-24.04, pkg ]
     steps:
       - name: Checkout code
         uses: actions/checkout@v4

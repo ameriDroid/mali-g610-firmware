@@ -7,7 +7,7 @@ permissions:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: [ self-hosted, ubuntu-24.04, pkg ]
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -93,6 +93,8 @@ jobs:
           version="$(dpkg-parsechangelog -S Version)"
           # replace ~ with - to match tag format
           version="${version//\~/\-}"
+          # remove epoch from version
+          version="${version##*:}"
           echo "version=$version" >> $GITHUB_ENV
           echo "changes<<EOF" >> $GITHUB_ENV
           echo '```' >> $GITHUB_ENV
